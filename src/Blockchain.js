@@ -139,8 +139,7 @@ class Blockchain {
     // }
     putBlockIntoStorage(key, BlockToAdd.toString(), (error) => {
       if (error) {
-        this.Mempool.putBlock(BlockToAdd, 1);
-        console.log(`Block ${key} submission failed`, error);
+        console.info(`Block ${key} submission failed`, error);
       } else {
         console.info('Key: ' + key);
         console.info(`Block ${BlockToAdd.getBlockHash()} added after ${BlockToAdd.getPreviousBlockHash()} with height ${BlockToAdd.getHeight()}`);  
