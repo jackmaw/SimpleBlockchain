@@ -1,11 +1,11 @@
-const Blockchain = require('./src/simpleChain').Blockchain;
-const Block = require('./src/simpleChain').Block;
+const Blockchain = require('./src/Blockchain').Blockchain;
+const Block = require('./src/Block').Block;
 
 let blockchain = new Blockchain("man_test");
 
 (function theLoop (i) {
   setTimeout(function () {
-    blockchain.addBlock(new Block('Testing data'));
+    blockchain.addBlock(new Block({body: 'Testing data'}));
     if (--i) theLoop(i);
   }, 50);
 })(100);
@@ -22,13 +22,13 @@ setTimeout(() => {
 }, 100 * 600);
 
 setTimeout(() => {
-  blockchain.getBlockHeight(() => {})
+  blockchain.getBlockHeight(() => {});
 
-  blockchain.validateChain((err, errorLog) => {
-    if (errorLog.length) {
+  blockchain.validateChain((err, isValid, errorLog) => {
+    if (!isValid) {
       console.log('Invalid blocks: ' + errorLog);
     } else {
       console.log('Blockchain is valid')
     }
   });
-}, 100 * 600 + 100 * 250);
+}, 100 * 600 + 100 * 220);
