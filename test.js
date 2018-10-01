@@ -1,5 +1,5 @@
-const Blockchain = require('./src/Blockchain').Blockchain;
-const Block = require('./src/Block').Block;
+const Blockchain = require('./src/blockchain/Blockchain').Blockchain;
+const Block = require('./src/blockchain/Block').Block;
 
 let blockchain = new Blockchain("man_test");
 

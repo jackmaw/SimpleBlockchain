@@ -6,7 +6,7 @@ const { readBlocksData, getBlockData, putBlockIntoStorage } = storageInterface;
 const Mempool = require('./Mempool').Mempool;
 const Block = require('./Block').Block;
 
-const MINING_INTERVAL = 500; //ms
+const MINING_INTERVAL = 100; //ms
 let processQueueTimer = null;
 
 /* ===== Blockchain Class ==========================
@@ -57,7 +57,7 @@ class Blockchain {
   scheduleProccesingBlocks() {
     processQueueTimer = setTimeout(() => {
         this.processMempool();
-      }, MINING_INTERVAL);
+    }, MINING_INTERVAL);
   }
 
   /**
@@ -65,12 +65,14 @@ class Blockchain {
    */
   processMempool() {
     if (!this.Mempool.isQueueLocked()) {
-      console.info('Process next item from mempool');
       this.Mempool.lockQueue();
       const newBlock = this.Mempool.getBlock();
-
       if(newBlock) {
+        console.info('Process next item from mempool');
         this.addBlockToDB(newBlock);
+      } else {
+        this.Mempool.unlockQueue();
+        this.scheduleProccesingBlocks();
       }
     } else {
       this.scheduleProccesingBlocks();
@@ -82,7 +84,11 @@ class Blockchain {
    * @param {Block} newBlock 
    */
   addBlock(newBlock) {
-    this.Mempool.putBlock(newBlock);
+    return this.Mempool.putBlock(newBlock);
+  }
+
+  checkBlockStatus(requestId) {
+    return this.Mempool.checkBlock(requestId);
   }
 
   /**
@@ -118,9 +124,10 @@ class Blockchain {
         this._unableToReadDataStream(error);
       },
       onClose: () => {
+        console.log(newBlock)
         const lastBlockHash = lastBlock ? JSON.parse(lastBlock).hash : null;
-        const BlockToAdd = this._buildNextBlock(nextIndex, lastBlockHash, newBlock);
-        this.addLevelDBData(nextIndex, BlockToAdd);
+        const blockToAdd = this._buildNextBlock(nextIndex, lastBlockHash, newBlock.block);
+        this.addLevelDBData(nextIndex, {jobId: newBlock.jobId, block: blockToAdd});
       }
     };
 
@@ -133,16 +140,15 @@ class Blockchain {
    * @param {Block} BlockToAdd 
    */
   addLevelDBData(key, BlockToAdd) {
-    // if ( (12 < key && key < 18) || (45 < key && key < 54)) {
-    //   console.log("HACKER ATTACKS!!")
-    //   BlockToAdd.hash = Math.random();
-    // }
-    putBlockIntoStorage(key, BlockToAdd.toString(), (error) => {
+    const {jobId, block} = BlockToAdd;
+    putBlockIntoStorage(key, block.toString(), (error) => {
       if (error) {
+        this.Mempool.updateBlockStatus(jobId, 'ERROR', block.toString(), error);
         console.info(`Block ${key} submission failed`, error);
       } else {
+        this.Mempool.updateBlockStatus(jobId, 'INSERTED', block.toString());
         console.info('Key: ' + key);
-        console.info(`Block ${BlockToAdd.getBlockHash()} added after ${BlockToAdd.getPreviousBlockHash()} with height ${BlockToAdd.getHeight()}`);  
+        console.info(`Block ${block.getBlockHash()} added after ${block.getPreviousBlockHash()} with height ${block.getHeight()}`);  
       }
 
       this.Mempool.unlockQueue();

@@ -7,7 +7,7 @@ class Block {
 	constructor(data){
     this.hash = data.hash || null,
     this.height = data.height || 0,
-    this.body = data.value,
+    this.body = data.body,
     this.time = data.time || 0,
     this.previousBlockHash = data.previousBlockHash || null;
   }
