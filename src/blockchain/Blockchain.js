@@ -3,7 +3,7 @@
 |  =========================================================*/
 const storageInterface = require('./storageInterface');
 const { readBlocksData, getBlockData, putBlockIntoStorage } = storageInterface;
-const Mempool = require('./Mempool').Mempool;
+const { Mempool, BLOCK_STATUSES } = require('./Mempool');
 const Block = require('./Block').Block;
 
 const MINING_INTERVAL = 100; //ms
@@ -87,8 +87,12 @@ class Blockchain {
     return this.Mempool.putBlock(newBlock);
   }
 
-  checkBlockStatus(requestId) {
-    return this.Mempool.checkBlock(requestId);
+  /**
+   * Check block status within the mempool
+   * @param {String} jobId 
+   */
+  checkBlockStatus(jobId) {
+    return this.Mempool.checkBlock(jobId);
   }
 
   /**
@@ -124,7 +128,6 @@ class Blockchain {
         this._unableToReadDataStream(error);
       },
       onClose: () => {
-        console.log(newBlock)
         const lastBlockHash = lastBlock ? JSON.parse(lastBlock).hash : null;
         const blockToAdd = this._buildNextBlock(nextIndex, lastBlockHash, newBlock.block);
         this.addLevelDBData(nextIndex, {jobId: newBlock.jobId, block: blockToAdd});
@@ -143,10 +146,10 @@ class Blockchain {
     const {jobId, block} = BlockToAdd;
     putBlockIntoStorage(key, block.toString(), (error) => {
       if (error) {
-        this.Mempool.updateBlockStatus(jobId, 'ERROR', block.toString(), error);
+        this.Mempool.updateBlockStatus(jobId, BLOCK_STATUSES.REJECTED, block.toString(), error);
         console.info(`Block ${key} submission failed`, error);
       } else {
-        this.Mempool.updateBlockStatus(jobId, 'INSERTED', block.toString());
+        this.Mempool.updateBlockStatus(jobId, BLOCK_STATUSES.INSERTED, block.toString());
         console.info('Key: ' + key);
         console.info(`Block ${block.getBlockHash()} added after ${block.getPreviousBlockHash()} with height ${block.getHeight()}`);  
       }

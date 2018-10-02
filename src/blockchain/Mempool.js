@@ -1,22 +1,38 @@
 
 const {randomBytes} = require('crypto');
+
+const BLOCK_STATUSES = {
+    ENQUEUED: 'ENQUEUED',
+    INSERTED: 'INSERTED',
+    REJECTED: 'REJECTED',
+    PROCESSING: 'PROCESSING'
+};
+
+const MEMPOOL_LIMIT = 1000;
 let isQueueLocked = false;
 
 class Mempool {
     constructor() {
-      //puchnie - komentarz
       this.blocksByJobId = {};
       this.blocks = [];
     }
-  
+    
     putBlock(block) {
       const jobId = randomBytes(16).toString('hex');
-      const status = 'ENQUEUED';
+      const status = BLOCK_STATUSES.ENQUEUED;
+
       const blockWithJobId = {
         jobId,
         block,
         status
       };
+
+      if (this.blocks.length === MEMPOOL_LIMIT) {
+        //Remove oldest block
+        const oldestBlock = this.blocks.shift();
+        delete blocksByJobId[oldestBlock.jobId];
+      }
+
       this.blocks.push(blockWithJobId);
       this.blocksByJobId[jobId] = blockWithJobId;
 
@@ -29,7 +45,7 @@ class Mempool {
     getBlock() {
       const nextBlock = this.blocks.shift();
       if (nextBlock) {
-          this.blocksByJobId[nextBlock.jobId].status = 'PROCESSING';
+          this.blocksByJobId[nextBlock.jobId].status = BLOCK_STATUSES.PROCESSING;
       }
 
       return nextBlock;
@@ -66,5 +82,6 @@ class Mempool {
 }
 
 module.exports = {
-    Mempool
+    Mempool,
+    BLOCK_STATUSES
 }
