@@ -2,6 +2,7 @@
 |  Class with a constructor for block 			   |
 |  ===============================================*/
 const SHA256 = require('crypto-js/sha256');
+const { getCurrentTimestamp } = require('../utils/appHelper');
 
 class Block {
 	constructor(data){
@@ -22,7 +23,7 @@ class Block {
 
   setTime() {
     //We dont slice here, because it returns unix timestamp
-    this.time = new Date().getTime().toString();
+    this.time = getCurrentTimestamp();
   }
 
 
