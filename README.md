@@ -43,8 +43,8 @@ In order to register star into this blockchain, you need a valid blockchain addr
 ## API Resources
 
   - [GET /block/:blockHeight](#get-blockblockHeight)
-  - [GET /star/address:walletAddress](#get-staraddresswalletaddress)
-  - [GET /star/hash:blockhash](#get-starhashblockhash)
+  - [GET /stars/address:walletAddress](#get-starsaddresswalletaddress)
+  - [GET /stars/hash:blockhash](#get-starshashblockhash)
   - [GET /mempool/:jobId](#get-mempooljobid)
   - [POST /block](#post-block)
   - [POST /requestValidation](#post-requestValidation)
@@ -58,11 +58,19 @@ Response body:
 
 ```json
     {
-        "hash": "68ecee1c0e1deb8ca1573d00f04b4d1d68cd72bb61a3f98010ccd39d095c3dec",
-        "height": 340,
-        "body": "Block body",
-        "time": "1538504769567",
-        "previousBlockHash": "7d26f81a518952197e6470a40a2019526a9db025d7329a8ef357adceca6dfcce"
+        "hash": "2a8fcb86fde57a3ceb421ca07f6e32a221b42d3a0c263d3bb0093b52ed0b7a40",
+        "height": 30,
+        "body": {
+            "address": "1LRH7zdocBSyagsNAhveKXtQzGS9w4xJFE",
+            "star": {
+                "dec": "-26° 29' 24.9",
+                "ra": "16h 29m 1.0s",
+                "story": "466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f20a32033",
+                "storyDecoded": "Found star using https://www.google.com/sky/ # 3"
+            }
+        },
+        "time": 1540150827,
+        "previousBlockHash": "8cf55eea8f89c025f235b758a5edcdebc4c9351aaabbda3843bb20cf420f2367"
     }
 ```
 
@@ -77,7 +85,7 @@ Response body when error:
 Errors: 
 INVALID_HEIGHT ||  BLOCK_NOT_FOUND_IN_BLOCKCHAIN ||  BLOCKCHAIN_UNAVAILABLE
 
-### GET /star/address:walletAddress
+### GET /stars/address:walletAddress
 
 Returns all stars which was registered by given walletAddress.
 
@@ -86,18 +94,19 @@ Response body:
 ```json
 [
     {
-        "hash": "9c44d9151ead4da3bc0781fb3b40fa9666bb06f4655228db1b647469ec0a90ac",
-        "height": 1,
+        "hash": "2a8fcb86fde57a3ceb421ca07f6e32a221b42d3a0c263d3bb0093b52ed0b7a40",
+        "height": 30,
         "body": {
             "address": "1LRH7zdocBSyagsNAhveKXtQzGS9w4xJFE",
             "star": {
                 "dec": "-26° 29' 24.9",
                 "ra": "16h 29m 1.0s",
-                "story": "Found star using https://www.google.com/sky/"
+                "story": "466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f20a32033",
+                "storyDecoded": "Found star using https://www.google.com/sky/ # 3"
             }
         },
-        "time": 1539807036,
-        "previousBlockHash": "dc19c4a9416b7c838059a8e70e332c8f3c8dfd5b0b329bb4027d4064bfd6785b"
+        "time": 1540150827,
+        "previousBlockHash": "8cf55eea8f89c025f235b758a5edcdebc4c9351aaabbda3843bb20cf420f2367"
     }
 ]
 ```
@@ -113,7 +122,7 @@ Response body when error:
 Errors: 
 INVALID_WALLET_ADDRESS_IN_REQUEST
 
-### GET /star/hash:blockhash
+### GET /stars/hash:blockhash
 
 Returns block from the blockchain based on given block hash.
 
@@ -121,18 +130,19 @@ Response body:
 
 ```json
 {
-    "hash": "84c6b5c480c7ffd7df8bae887d4e54c548ced6a804a1bfb6675e264dc6c87d4a",
-    "height": 6,
+    "hash": "2a8fcb86fde57a3ceb421ca07f6e32a221b42d3a0c263d3bb0093b52ed0b7a40",
+    "height": 30,
     "body": {
         "address": "1LRH7zdocBSyagsNAhveKXtQzGS9w4xJFE",
         "star": {
             "dec": "-26° 29' 24.9",
             "ra": "16h 29m 1.0s",
-            "story": "Found star using https://www.google.com/sky/ 2"
+            "story": "466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f20a32033",
+            "storyDecoded": "Found star using https://www.google.com/sky/ # 3"
         }
     },
-    "time": 1540133045,
-    "previousBlockHash": "c3533374d327faab2c6ca4f742d27423dcef2840bb7891e6d8a371728ed30b1d"
+    "time": 1540150827,
+    "previousBlockHash": "8cf55eea8f89c025f235b758a5edcdebc4c9351aaabbda3843bb20cf420f2367"
 }
 ```
 
@@ -203,14 +213,18 @@ Response body:
 
 ```json
 {
-    "status": "INSERTED",
-    "block": {
-        "hash": "84c6b5c480c7ffd7df8bae887d4e54c548ced6a804a1bfb6675e264dc6c87d4a",
-        "height": 6,
-        "body": "{\"address\":\"1LRH7zdocBSyagsNAhveKXtQzGS9w4xJFE\",\"star\":{\"dec\":\"-26° 29' 24.9\",\"ra\":\"16h 29m 1.0s\",\"story\":\"466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f2032\"}}",
-        "time": 1540133045,
-        "previousBlockHash": "c3533374d327faab2c6ca4f742d27423dcef2840bb7891e6d8a371728ed30b1d"
-    }
+    "hash": "60937577d1c96cbdedf58fd9e7ff22e4005316663413993c9d6345c4df89dd5d",
+    "height": 35,
+    "body": {
+        "address": "1LRH7zdocBSyagsNAhveKXtQzGS9w4xJFE",
+        "star": {
+            "dec": "-26° 29' 24.9",
+            "ra": "16h 29m 1.0s",
+            "story": "466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f2033"
+        }
+    },
+    "time": 1540151690,
+    "previousBlockHash": "37f2af54dea064cf8efd73a25b7b001e25e47fec99acfd8bb10886fe5d6108f0"
 }
 ```
 

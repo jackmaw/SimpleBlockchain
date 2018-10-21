@@ -5,7 +5,7 @@ const bitcoin = require('bitcoinjs-lib');
 const bitcoinMessage = require('bitcoinjs-message');
 
 const { getErrorResponse } = require('../utils/errorsHelper');
-const { getCurrentTimestamp, makeValidationMessage  } = require('../utils/appHelper');
+const { getCurrentValidationWindow  } = require('../utils/appHelper');
 const { errorTypes } = require('../constants/errors');
 const { VALIDATION_WINDOW } = require('../constants/star');
 
@@ -28,10 +28,9 @@ function getRouter(pendingWalletValidations, pendingStarRegistrations) {
                 res.status(404)
                     .json(getErrorResponse(errorTypes.NO_PENDING_WALLIDATION_FOR_WALLET, `There is no pending validation for wallet: ${address}`));
             } else {
-                const pendingValidation = pendingWalletValidations[address];
-                const timeDiff = getCurrentTimestamp() - pendingValidation.requestTimestamp;
-                let newValidationWindow = VALIDATION_WINDOW - timeDiff;
-
+                const pendingValidation = pendingWalletValidations[address];  
+                let newValidationWindow = getCurrentValidationWindow(pendingValidation.requestTimestamp, VALIDATION_WINDOW);
+                
                 if (newValidationWindow < 0) {
                     res.status(408)
                         .json(getErrorResponse(errorTypes.VALIDATION_WINDOW_EXPIRES, `Validation window expires for wallet: ${address}`));
