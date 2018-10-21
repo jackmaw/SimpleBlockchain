@@ -192,6 +192,15 @@ class Blockchain {
   }
 
 /**
+ * Reads all blocks from the blockchain
+ * @param {Object} readOptions 
+ * @param {Object} callbacks 
+ */
+  readAllBlocks(readOptions = null, callbacks) {
+    readBlocksData(readOptions, callbacks);
+  }
+
+/**
  * Validates block - check if its hash its correct
  * @param {Number} blockHeight 
  * @param {Function} callback 

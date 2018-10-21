@@ -10,6 +10,20 @@ function haltOnTimedout (req, res, next) {
     if (!req.timedout) next();
 }
 
+function getCurrentTimestamp() {
+    return Date.now() / 1000 | 0;
+}
+
+function makeValidationMessage(walletAddress, timestamp) {
+    if (!walletAddress || !timestamp) {
+        throw new Error('Cannot create validation message: Invalid parameters');
+    }
+
+    return `${walletAddress}:${timestamp}:starRegistry`;
+}
+
 module.exports = {
-    haltOnTimedout
+    haltOnTimedout,
+    getCurrentTimestamp,
+    makeValidationMessage
 };
