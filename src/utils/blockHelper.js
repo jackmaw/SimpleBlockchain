@@ -24,14 +24,23 @@ function transformBlockFromStorage(block) {
     let blockData = JSON.parse(block);
     let blockBody = JSON.parse(blockData.body);
      
-    blockBody.star.story = readStringBuffer(blockBody.star.story, 'hex', 'ascii');
+    blockBody.star.storyDecoded = readStringBuffer(blockBody.star.story, 'hex', 'ascii');
     blockData.body = blockBody;
 
     return blockData;
 }
 
+/**
+ * Checks if there is a character which is not an ascii valid one
+ * @param {String} toCheck 
+ */
+function hasMoreThanAscii(toCheck) {
+    return [...toCheck].some(char => char.charCodeAt(0) > 127);
+}
+
 module.exports = {
     isValidHeight,
     readStringBuffer,
-    transformBlockFromStorage
+    transformBlockFromStorage,
+    hasMoreThanAscii
 }

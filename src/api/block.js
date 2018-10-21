@@ -3,10 +3,10 @@ const express = require('express');
 const router = express.Router();
 
 const { getErrorResponse } = require('../utils/errorsHelper');
-const { isValidHeight, transformBlockFromStorage, readStringBuffer } = require('../utils/blockHelper');
+const { isValidHeight, transformBlockFromStorage, readStringBuffer, hasMoreThanAscii } = require('../utils/blockHelper');
 const { errorTypes } = require('../constants/errors');
 const { checkStatusConstants } = require('../constants/block');
-const { getCurrentTimestamp } = require('../utils/appHelper');
+const { getCurrentValidationWindow } = require('../utils/appHelper');
 const { VALIDATION_WINDOW, STAR_STORY_LIMIT } = require('../constants/star');
 
 function getRouter(Chain, Block, pendingStarRegistrations) {
@@ -27,15 +27,27 @@ function getRouter(Chain, Block, pendingStarRegistrations) {
                         throw new Error('Address not authorized');
                     }
 
-                    const timeDiff = getCurrentTimestamp() - pendingStarRegistrations[address].requestTimestamp;
-                    let newValidationWindow = VALIDATION_WINDOW - timeDiff;
-
                     //check if validation window expires
+                    let newValidationWindow = getCurrentValidationWindow(pendingStarRegistrations[address].requestTimestamp, VALIDATION_WINDOW);
                     if (newValidationWindow <= 0) {
                         delete pendingStarRegistrations[address];
                         throw new Error('Validation window expires');
                     }
+                    
+                    //check star coordinates
+                    if (!star.dec) {
+                        throw new Error('Star: dec property is missing');
+                    }
 
+                    if (!star.ra) {
+                        throw new Error('Star: ra property is missing');
+                    }
+
+                    //validate if all chars are ascii
+                    if (hasMoreThanAscii(star.story)) {
+                        throw new Error('Star: non ASCII characters presented in star story');
+                    }
+    
                     //check star story size
                     const checkStarStorySize = Buffer.byteLength(star.story, 'ascii');
                     if (checkStarStorySize > STAR_STORY_LIMIT) {
@@ -57,7 +69,7 @@ function getRouter(Chain, Block, pendingStarRegistrations) {
                 }
 
                 const addBlockResult = Chain.addBlock(new Block({body: blockBody}));
-                delete pendingStarRegistrations[req.address];
+                delete pendingStarRegistrations[req.body.address];
                 /*
                     For now its ok to check status here, because only one client adds blocks to the blockchain.
                     Also, every block should be added after 100-200ms, thus we can check status here and wait until block was consumed by Chain.
@@ -69,12 +81,14 @@ function getRouter(Chain, Block, pendingStarRegistrations) {
                     if (currentTrial++ < checkStatusConstants.NUMBER_OF_TRIALS) {
                         const blockStatus = Chain.checkBlockStatus(addBlockResult.jobId);
                         const {status, block} = blockStatus;
-
+                        const blockData = JSON.parse(block);
+                        const blockBody = JSON.parse(blockData.body);
+                        console.log(blockBody)
                         if (status === 'INSERTED') {
                             clearInterval(interval);
                             res.status(200).json({
-                                status,
-                                block: JSON.parse(block)
+                                ...blockData,
+                                body: blockBody
                             });
                         } else if (status === 'ERROR') {
                             clearInterval(interval);

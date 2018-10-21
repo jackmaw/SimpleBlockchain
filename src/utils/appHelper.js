@@ -14,6 +14,11 @@ function getCurrentTimestamp() {
     return Date.now() / 1000 | 0;
 }
 
+function getCurrentValidationWindow(requestTimestamp, validationWindow) {
+    const timeDiff = getCurrentTimestamp() - requestTimestamp;
+    return validationWindow - timeDiff;
+}
+
 function makeValidationMessage(walletAddress, timestamp) {
     if (!walletAddress || !timestamp) {
         throw new Error('Cannot create validation message: Invalid parameters');
@@ -25,5 +30,6 @@ function makeValidationMessage(walletAddress, timestamp) {
 module.exports = {
     haltOnTimedout,
     getCurrentTimestamp,
-    makeValidationMessage
+    makeValidationMessage,
+    getCurrentValidationWindow
 };

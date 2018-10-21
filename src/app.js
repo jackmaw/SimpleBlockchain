@@ -22,7 +22,7 @@ const blockRouter = require('./api/block');
 const mempoolRouter = require('./api/mempool');
 const requestValidationRouter = require('./api/requestValidation');
 const messageSignatureRouter = require('./api/messageSignature');
-const startRouter = require('./api/star');
+const starsRouter = require('./api/stars');
 
 //Initialize application
 const app = express();
@@ -39,6 +39,6 @@ app.use('/block', blockRouter(Chain, Block, pendingStarRegistrations));
 app.use('/mempool', mempoolRouter(Chain));
 app.use('/requestValidation', requestValidationRouter(pendingWalletValidations));
 app.use('/message-signature', messageSignatureRouter(pendingWalletValidations, pendingStarRegistrations));
-app.use('/star', startRouter(Chain));
+app.use('/stars', starsRouter(Chain));
 
 app.listen(port, () => console.info(`Simple blockchain web service listening on port ${port}!`))
