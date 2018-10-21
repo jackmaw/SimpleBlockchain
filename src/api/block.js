@@ -21,7 +21,7 @@ function getRouter(Chain, Block, pendingStarRegistrations) {
 
                 try {
                     const {address, star} = req.body;
-                    console.log(pendingStarRegistrations[address])
+
                     //check if address is allowed to add new star
                     if (!pendingStarRegistrations[address]) {
                         throw new Error('Address not authorized');
@@ -34,7 +34,7 @@ function getRouter(Chain, Block, pendingStarRegistrations) {
                         throw new Error('Validation window expires');
                     }
                     
-                    //check star Ra
+                    //check star coordinates
                     if (!star.dec) {
                         throw new Error('Star: dec property is missing');
                     }
