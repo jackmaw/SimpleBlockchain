@@ -1,8 +1,8 @@
 {
   "name": "SimpleBlockchain",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Blockchain has the potential to change the way that the world approaches data. Develop Blockchain skills by understanding the data model behind Blockchain by developing your own simplified private blockchain.",
-  "main": "levelSandbox.js",
+  "main": "app.js",
   "scripts": {
     "test": "node test.js",
     "start": "node src/app.js",
